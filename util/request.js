@@ -34,23 +34,23 @@ const chooseUserAgent = ua => {
 
 const createRequest = (method, url, data, options) => {
   return new Promise((resolve, reject) => {
-    let headers = { 'User-Agent': chooseUserAgent(options.ua) }
+    let headers = {'User-Agent': chooseUserAgent(options.ua)}
     if (method.toUpperCase() === 'POST')
       headers['Content-Type'] = 'application/x-www-form-urlencoded'
     if (url.includes('music.163.com'))
       headers['Referer'] = 'https://music.163.com'
-    // headers['X-Real-IP'] = '118.88.88.88'
+		  headers['X-Real-IP'] = '192.168.2.101'
     if (typeof options.cookie === 'object')
       headers['Cookie'] = Object.keys(options.cookie)
         .map(
           key =>
             encodeURIComponent(key) +
-            '=' +
-            encodeURIComponent(options.cookie[key])
+						'=' +
+						encodeURIComponent(options.cookie[key])
         )
         .join('; ')
     else if (options.cookie) headers['Cookie'] = options.cookie
-      
+
     if (!headers['Cookie']) {
       headers['Cookie'] = options.token || ''
     }
@@ -66,7 +66,7 @@ const createRequest = (method, url, data, options) => {
         params: data
       })
       headers['User-Agent'] =
-        'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36'
+				'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36'
       url = 'https://music.163.com/api/linux/forward'
     } else if (options.crypto === 'eapi') {
       const cookie = options.cookie || {};
@@ -90,8 +90,8 @@ const createRequest = (method, url, data, options) => {
         .map(
           key =>
             encodeURIComponent(key) +
-            '=' +
-            encodeURIComponent(header[key])
+						'=' +
+						encodeURIComponent(header[key])
         )
         .join('; ')
       data.header = header
@@ -99,7 +99,7 @@ const createRequest = (method, url, data, options) => {
       url = url.replace(/\w*api/, 'eapi')
     }
 
-    const answer = { status: 500, body: {}, cookie: [] }
+    const answer = {status: 500, body: {}, cookie: []}
     const settings = {
       method: method,
       url: url,
@@ -120,7 +120,7 @@ const createRequest = (method, url, data, options) => {
       (err, res, body) => {
         if (err) {
           answer.status = 502
-          answer.body = { code: 502, msg: err.stack }
+          answer.body = {code: 502, msg: err.stack}
           reject(answer)
         } else {
           answer.cookie = (res.headers['set-cookie'] || []).map(x =>
@@ -132,10 +132,10 @@ const createRequest = (method, url, data, options) => {
               zlib.unzip(body, function (err, buffer) {
                 const _buffer = err ? body : buffer
                 try {
-                  try{
+                  try {
                     answer.body = JSON.parse(encrypt.decrypt(_buffer).toString())
                     answer.status = answer.body.code || res.statusCode
-                  } catch(e){
+                  } catch (e) {
                     answer.body = JSON.parse(_buffer.toString())
                     answer.status = res.statusCode
                   }
@@ -144,7 +144,7 @@ const createRequest = (method, url, data, options) => {
                   answer.status = res.statusCode
                 }
                 answer.status =
-                  100 < answer.status && answer.status < 600 ? answer.status : 400
+									100 < answer.status && answer.status < 600 ? answer.status : 400
                 if (answer.status === 200) resolve(answer)
                 else reject(answer)
               });
@@ -154,7 +154,7 @@ const createRequest = (method, url, data, options) => {
 
               answer.body = JSON.parse(body)
               answer.status = answer.body.code || res.statusCode
-              if(answer.body.code === 502){
+              if (answer.body.code === 502) {
                 answer.status = 200
               }
             }
@@ -165,7 +165,7 @@ const createRequest = (method, url, data, options) => {
           }
 
           answer.status =
-            100 < answer.status && answer.status < 600 ? answer.status : 400
+						100 < answer.status && answer.status < 600 ? answer.status : 400
           if (answer.status == 200) resolve(answer)
           else reject(answer)
         }
